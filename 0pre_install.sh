@@ -55,9 +55,33 @@ echo "设置免密登录"
 echo "$user ALL = (root) NOPASSWD:ALL" | tee /etc/sudoers.d/$user
 chmod 0440 /etc/sudoers.d/$user
 
+# 配置国内阿里源
+if [[ $cn == 'y' ]]
+then
+	echo "备份source.list"
+	cp /etc/apt/sources.list{,.bak}
+	cat <<EOF >/etc/apt/sources.list
+	deb http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse
+    deb-src http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse
+
+    deb http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse
+    deb-src http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse
+
+    deb http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse
+    deb-src http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse
+
+    deb http://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe multiverse
+    deb-src http://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe multiverse
+
+    deb http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
+    deb-src http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
+	EOF
+fi
+	
+
 # 加入跳板机
 apt update
-apt install python vim git numactl glances htop -y
+apt install python vim git wget sysstat net-tools numactl glances htop -y
 echo "加入跳板机"
 if [ ! -f /root/.ssh/id_rsa ]
 then
@@ -188,6 +212,10 @@ if [ $NEEDGPU -ne 0 ]; then
   echo "reboot to make the GPU to take effect!"
 fi
 
-chown -R $user:$user /opt/lotus-ops
+# 克隆专用脚本仓库
+echo "克隆专用脚本仓库"
+cd /home/xl && git clone https://github.com/vanvank/lotus-ops.git
+chown -R $user:$user /home/xl/lotus-ops
+cd /home/xl/lotus-ops && chmod +x *.sh && chmod +x *.py
 
-
+echo "初始化完成"
