@@ -60,7 +60,7 @@ if [[ $cn == 'y' ]]
 then
 	echo "备份source.list"
 	cp /etc/apt/sources.list{,.bak}
-	cat <<EOF >/etc/apt/sources.list
+	cat >/etc/apt/sources.list <<EOF 
 	deb http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse
     deb-src http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse
 
@@ -75,13 +75,13 @@ then
 
     deb http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
     deb-src http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
-	EOF
+EOF
 fi
 	
 
 # 加入跳板机
 apt update
-apt install python vim git wget sysstat net-tools numactl glances htop -y
+apt install python vim git wget sysstat net-tools numactl glances htop curl gcc git bzr jq pkg-config -y
 echo "加入跳板机"
 if [ ! -f /root/.ssh/id_rsa ]
 then
